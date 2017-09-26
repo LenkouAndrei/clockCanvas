@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<canvas id='CVS'></canvas>
+	<script>
+		document.body.style.margin = 0;
+		document.body.style.padding = 0;
+
+			 var Canvas=document.getElementById('CVS');
+		   var Context=Canvas.getContext('2d');
+
+		   var Timer=null;
+		   var StartTime;
+
+		   var NumSecond;
+		   var NumMinute;
+		   var NumHour;
+		   var minute;
+		   var hours;
+
+		   var SecondH= // секундная стрелка
+		   {
+		       PosX : 200, // центр часов
+		       PosY : 200, 
+		       degreeInSecond : 6, // угол поворота секундной стрелки за 1 секунду
+		       HandTailSecond : 20, // хвостик
+		       HandMainSecond : 120, // основная часть стрелки
+
+		       Update : function() // рисует секундную стрелку
+		       {
+		           Context.strokeStyle='black';
+		           Context.lineWidth=3;
+		           Context.lineCap = 'round';
+		           //рисую стрелку секундную
+		               var SXht=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInSecond*NumSecond)/180))*this.HandTailSecond;//здесь в скобках значение угла в градусах переведены в радианы
+		               var SYht=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInSecond*NumSecond)/180))*this.HandTailSecond;
+		               var SXhm=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInSecond*NumSecond)/180))*this.HandMainSecond;
+		               var SYhm=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInSecond*NumSecond)/180))*this.HandMainSecond;
+		               Context.beginPath();
+		               Context.moveTo(this.PosX - SXht,this.PosY + SYht);
+		               Context.lineTo(this.PosX + SXhm,this.PosY - SYhm);
+		               Context.stroke();
+		           }
+		   }
+
+		   		   var MinutesH= // минутная стрелка
+		   {
+		       PosX : 200, // центр часов
+		       PosY : 200, 
+		       degreeInMinute : 6, // угол поворота минутной за 1 минуту
+		       HandTailMinute : 20, // хвостик
+		       HandMainMinute : 100, // основная часть стрелки
+
+		       Update : function() // рисует секундную стрелку
+		       {
+		           Context.strokeStyle='black';
+		           Context.lineWidth=6;
+		           Context.lineCap = 'round';
+		           //рисую стрелку минутную
+		               var SXht=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInMinute*minute)/180))*this.HandTailMinute;//здесь в скобках значение угла в градусах переведены в радианы
+		               var SYht=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInMinute*minute)/180))*this.HandTailMinute;
+		               var SXhm=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInMinute*minute)/180))*this.HandMainMinute;
+		               var SYhm=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInMinute*minute)/180))*this.HandMainMinute;
+		               Context.beginPath();
+		               Context.moveTo(this.PosX - SXht,this.PosY + SYht);
+		               Context.lineTo(this.PosX + SXhm,this.PosY - SYhm);
+		               Context.stroke();
+		           }
+		   }
+
+		   		   var HourH= // часовая стрелка
+		   {
+		       PosX : 200, // центр часов
+		       PosY : 200, 
+		       degreeInHour : 30, // угол поворота часовой стрелки за 1 час
+		       HandTailHour : 20, // хвостик
+		       HandMainHour : 80, // основная часть стрелки
+
+		       Update : function() // рисует секундную стрелку
+		       {
+		           Context.strokeStyle='black';
+		           Context.lineWidth=10;
+		           Context.lineCap = 'round';
+		           //рисую стрелку минутную
+		               var SXht=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInHour*hours)/180))*this.HandTailHour;//здесь в скобках значение угла в градусах переведены в радианы
+		               var SYht=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInHour*hours)/180))*this.HandTailHour;
+		               var SXhm=Math.cos((Math.PI/2) - (Math.PI*(this.degreeInHour*hours)/180))*this.HandMainHour;
+		               var SYhm=Math.sin((Math.PI/2) - (Math.PI*(this.degreeInHour*hours)/180))*this.HandMainHour;
+		               Context.beginPath();
+		               Context.moveTo(this.PosX - SXht,this.PosY + SYht);
+		               Context.lineTo(this.PosX + SXhm,this.PosY - SYhm);
+		               Context.stroke();
+		           }
+		   }
+
+		   var ClockFaceH= // циферблат
+		   {
+		       Width : 400,
+		       Height : 400,
+		       PosX : 200,
+		       PosY : 200,
+		       CFRadius : 200,
+		       RadiusForNumbers : 170,// расстояние от центра на котором будет нарисован кружок
+		       RadiusOfNumbers : 20,// радиус кружка
+		       digitalCFPosX : 137,// позиция по Х электронного циферблата
+		       digitalCFPosY : 70,// позиция по У электронного циферблата
+		       digitalCFWidth : 127, // ширина электронного циферблата
+		       digitalCFHeight : 35, // высота электронного циферблата
+		       AngelNumbers : 300,
+		       hourNumber : 1,
+		       TimePosX : 140,
+		       TimePosY : 70,
+		       Update : function()
+		       {
+		       	 //создаём циферблат круглый
+		       	 Context.strokeStyle = 'yellow';
+		       	 Context.lineWidth = 1;
+		       	 Context.beginPath();
+		       	 Context.arc(this.PosX, this.PosY, this.CFRadius, 0, 2*Math.PI, false);
+		       	 Context.fillStyle = 'yellow';
+		       	 Context.fill();
+		       	 Context.stroke();
+
+     			   //создаём ряд кругляшков для циферок с циферками
+     			   for( i=1 ; i<13 ; i++){
+     			   	var SX = Math.cos((Math.PI*(this.AngelNumbers)/180))*this.RadiusForNumbers;
+     			   	var SY = Math.sin((Math.PI*(this.AngelNumbers)/180))*this.RadiusForNumbers;
+     			   	Context.strokeStyle = 'green';
+     			   	Context.lineWidth = 1;
+     			   	Context.beginPath();
+     	    		Context.arc(this.PosX + SX, this.PosY + SY, this.RadiusOfNumbers, 0, 2*Math.PI, false);
+     	    		Context.fillStyle = 'green';
+     	    		Context.fill();
+     	    		Context.stroke();
+     	    		Context.textBaseline = "hanging";
+     	    		Context.font = "bold 20px Arial";
+     	    		Context.fillStyle = "black";
+     	    		Context.fillText(this.hourNumber, this.PosX + SX - 10, this.PosY + SY);
+     	    		this.hourNumber +=1;
+     	    		this.AngelNumbers +=30;
+     			   }
+     			   this.AngelNumbers = 300;
+     			   this.hourNumber = 1;
+
+     			   // создаём электронный циферблат
+     			   Context.fillStyle='white';
+     			   Context.fillRect(this.digitalCFPosX, this.digitalCFPosY, this.digitalCFWidth, this.digitalCFHeight);
+     			   Context.textBaseline = "top";
+     			   Context.font = "bold 30px Arial";
+     			   Context.fillStyle = "red";
+     			   Context.fillText(editTime(new Date()).str, this.TimePosX, this.TimePosY);
+		       }
+		   }
+
+		   // устанавливаем размер холста
+		   Canvas.width=ClockFaceH.Width;
+		   Canvas.height=ClockFaceH.Height;
+
+		   function editTime(DT){
+		   	var Hours = DT.getHours();
+		   	var Minutes = DT.getMinutes();
+		   	var Seconds = DT.getSeconds();
+		   	return {'str' : toStr(Hours,2) + ':' +  toStr(Minutes,2) + ':' + toStr(Seconds,2),
+		   					'minutes' : Minutes,
+		   					'seconds' : Seconds,
+		   					'hours' : Hours};
+		   }
+
+		   function toStr(val, len){
+		   	var strVal = val.toString();
+		   	while ( strVal.length < len ){
+		   		strVal = '0' + strVal;
+		   	}
+		   	return strVal;
+		   }
+
+		   function update(){
+		   	NumSecond = parseInt(editTime(new Date()).seconds);
+		   	NumMinute = parseInt(editTime(new Date()).minutes);
+		   	NumHour = parseInt(editTime(new Date()).hours);
+		   	minute = (NumMinute + (NumSecond/60));
+		   	NumHour = NumHour > 12 ? NumHour - 12 : NumHour;
+		   	hours = (NumHour + (NumMinute/60) + (NumSecond/3600));
+		   	ClockFaceH.Update();
+		   	HourH.Update();
+		   	MinutesH.Update();
+		   	SecondH.Update();
+		   }
+
+		   setInterval(update, 1000);
+	</script>
+</body>
+</html>
